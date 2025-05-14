@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ etf_code }} ETF Analysis Report</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .header h1 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .date {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        .price-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        .price-block {
+            text-align: center;
+            padding: 10px;
+        }
+        .price-value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        .price-label {
+            font-size: 0.8em;
+            color: #7f8c8d;
+        }
+        .signal-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .signal-buy {
+            background-color: rgba(46, 204, 113, 0.2);
+            border: 1px solid #2ecc71;
+        }
+        .signal-sell {
+            background-color: rgba(231, 76, 60, 0.2);
+            border: 1px solid #e74c3c;
+        }
+        .signal-hold {
+            background-color: rgba(241, 196, 15, 0.2);
+            border: 1px solid #f1c40f;
+        }
+        .signal {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        .buy {
+            color: #27ae60;
+        }
+        .sell {
+            color: #c0392b;
+        }
+        .hold {
+            color: #d35400;
+        }
+        .indicators {
+            margin: 30px 0;
+        }
+        .indicators h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .indicator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .indicator-box {
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+        .indicator-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        .indicator-name {
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+        .charts {
+            margin-top: 40px;
+        }
+        .chart-container {
+            margin-bottom: 30px;
+        }
+        .chart-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{ etf_code }} - ETF Analysis Report</h1>
+            <div class="date">Generated on: {{ report_date }}</div>
+        </div>
+        
+        <div class="price-info">
+            <div class="price-block">
+                <div class="price-value">{{ price }}</div>
+                <div class="price-label">Close Price</div>
+            </div>
+            <div class="price-block">
+                <div class="price-value" style="color: {{ 'green' if change_percent > 0 else 'red' }}">
+                    {{ change_percent_fmt }}%
+                </div>
+                <div class="price-label">Daily Change</div>
+            </div>
+            <div class="price-block">
+                <div class="price-value">{{ volume }}</div>
+                <div class="price-label">Volume</div>
+            </div>
+        </div>
+        
+        {% set signal_class = "signal-buy" if "buy" in signal.lower() else "signal-sell" if "sell" in signal.lower() else "signal-hold" %}
+        {% set signal_text_class = "buy" if "buy" in signal.lower() else "sell" if "sell" in signal.lower() else "hold" %}
+        
+        <div class="signal-container {{ signal_class }}">
+            <div>Today's Signal:</div>
+            <div class="signal {{ signal_text_class }}">{{ signal }}</div>
+        </div>
+        
+        <div class="indicators">
+            <h2>Technical Indicators</h2>
+            <div class="indicator-grid">
+                <div class="indicator-box">
+                    <div class="indicator-name">K Value</div>
+                    <div class="indicator-value">{{ k_value }}</div>
+                </div>
+                <div class="indicator-box">
+                    <div class="indicator-name">D Value</div>
+                    <div class="indicator-value">{{ d_value }}</div>
+                </div>
+                <div class="indicator-box">
+                    <div class="indicator-name">MACD</div>
+                    <div class="indicator-value">{{ macd }}</div>
+                </div>
+                <div class="indicator-box">
+                    <div class="indicator-name">MACD Signal</div>
+                    <div class="indicator-value">{{ macd_signal }}</div>
+                </div>
+                <div class="indicator-box">
+                    <div class="indicator-name">RSI</div>
+                    <div class="indicator-value">{{ rsi }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="charts">
+            <h2>Technical Analysis Charts</h2>
+            <div class="chart-container">
+                <img src="{{ summary_chart_path }}" alt="Summary Chart">
+            </div>
+            <div class="chart-container">
+                <img src="{{ technical_chart_path }}" alt="Technical Analysis">
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>ETF Tracker & Analyzer | Generated by Taiwan-ETF-Tracker</p>
+            <p>© {{ current_year }} Chen Qi'an | <a href="https://github.com/anderson155081">GitHub</a></p>
+        </div>
+    </div>
+</body>
+</html> 

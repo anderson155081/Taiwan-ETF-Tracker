@@ -1,75 +1,81 @@
-這是為你的「ETF 自動追蹤與分析系統」專案設計的 README.md 初稿，清楚說明功能、架構與使用方式：
-
-⸻
-
-
-
 # ETF Tracker & Analyzer 📈
 
-一個可部署在雲端的自動化系統，用來每日追蹤台股市值型 ETF（如 0050、006208），根據技術指標產出視覺化分析與投資建議，並可透過 Email 或 LINE 推播每日分析報告。
+A cloud-deployable automation tool that tracks Taiwan's market cap ETFs (e.g., 0050, 006208) daily, generates beautiful visual analyses with technical indicators, and suggests potential entry signals. Results can be pushed via LINE Messaging API for real-time updates.
 
-## 🚀 功能特色
+## 🚀 Features
 
-- 每日自動抓取 ETF 價格資料（支援 0050、006208 等）
-- 計算並繪製技術指標圖表（KD, MACD, 均線等）
-- 根據自定策略給出「建議進場/持有/觀望」
-- 產出每日分析報告（HTML / 圖表）
-- 可整合 LINE Notify / Email 做每日推播
-- 可部署於 Cloud Run、Railway、GitHub Actions 等平台
+- Automatically fetches ETF price data daily (supports 0050, 006208, etc.)
+- Calculates and plots technical indicators (KD, MACD, moving averages)
+- Applies custom strategy rules to suggest Buy / Hold / Watch decisions
+- Generates clear visual reports (PNG/HTML)
+- Sends reports via LINE Messaging API
+- Deployable on platforms like Railway, Google Cloud Run, or GitHub Actions
 
-## 🛠 技術架構
+## 🛠 Tech Stack
 
-- 語言：Python 3.10+
-- 套件：`yfinance`, `pandas`, `ta`, `matplotlib`, `jinja2`
-- 推播：LINE Notify / SMTP Email
-- 部署：支援 Railway、Google Cloud Run、GitHub Actions 排程
+- **Language**: Python 3.10+
+- **Libraries**: `yfinance`, `pandas`, `ta`, `matplotlib`, `jinja2`, `flask` (for LINE bot webhook)
+- **Notification**: LINE Messaging API (via webhook & reply API)
+- **Deployment**: GitHub Actions / Railway / Google Cloud Run / Render
 
-## 📁 專案結構
+## 📁 Project Structure
 
+```
 etf_tracker/
-├── main.py                  # 主程式入口
-├── strategy.py              # 技術指標與買進邏輯
-├── data_fetcher.py          # 擷取 ETF 價格資料
-├── plotter.py               # 繪製技術分析圖表
-├── notifier.py              # LINE / Email 通知
-├── templates/               # HTML 分析報告模板
-├── reports/                 # 每日產出的圖表與報告
-└── requirements.txt         # Python 套件需求
+├── main.py                  # Main pipeline
+├── strategy.py              # Buy/sell signal logic
+├── data_fetcher.py          # Fetches ETF historical/real-time data
+├── plotter.py               # Chart generation using technical indicators
+├── line_bot.py              # LINE Messaging API integration (webhook receiver)
+├── templates/               # HTML templates for rendering reports
+├── reports/                 # Output report images or HTML
+└── requirements.txt         # Python dependencies
+```
 
-## 🔄 自動執行排程建議
+## 🔁 Daily Execution
 
-你可以透過下列平台實作每日執行：
-- **GitHub Actions**（免費、易設定）
+Use any of the following to automate daily runs:
+- **GitHub Actions** (free & easy for scheduled jobs)
 - **Google Cloud Scheduler + Cloud Run**
-- **Railway / Render** 透過 Webhook 或 CRON 執行
+- **Railway** or **Render** (supports CRON)
 
-## 🔔 通知設定
+## 💬 LINE Messaging API Setup
 
-### LINE Notify 範例
-1. 前往 [LINE Notify 官網](https://notify-bot.line.me/) 建立權杖
-2. 將 token 加入 `.env` 或直接放入 `notifier.py`
+1. Create a [LINE Developer Account](https://developers.line.biz/)
+2. Create a Messaging API channel
+3. Deploy a webhook receiver using Flask (e.g., `line_bot.py`)
+4. Push messages using the LINE Reply/Push API
 
 ```python
-LINE_TOKEN = "your_token"
+from linebot import LineBotApi
+from linebot.models import TextSendMessage
 
-📊 技術指標支援
+line_bot_api = LineBotApi('YOUR_CHANNEL_ACCESS_TOKEN')
+user_id = 'USER_ID'
+line_bot_api.push_message(user_id, TextSendMessage(text='0050 strategy report is ready!'))
+```
 
-指標	說明
-KD	隨機震盪指標（過熱/超賣區）
-MACD	移動平均收斂背離
-MA	簡單移動平均線
+## 📊 Supported Indicators
 
-✅ TODO
-	•	支援更多 ETF（如 00878, 00929 等）
-	•	加入回測機制
-	•	網頁 Dashboard 視覺化前端
-	•	支援 Telegram Bot
+| Indicator | Description |
+|-----------|-------------|
+| KD | Stochastic Oscillator |
+| MACD | Moving Average Convergence |
+| MA | Simple Moving Averages |
 
-🧑‍💻 作者
+## ✅ TODO
 
-Chen Qi’an（陳麒安）
-📸 IG: @ande.rsonphoto
+- Add more ETFs (e.g., 00878, 00929)
+- Implement backtesting
+- Build web dashboard for historical insights
+- Support Telegram Bot alternative
 
-⸻
+## 👤 Author
 
-歡迎 Fork / Star / 改進 🎯
+Chen Qi'an
+- GitHub: [anderson155081](https://github.com/anderson155081)
+- Instagram: [@ande.rsonphoto](https://instagram.com/ande.rsonphoto)
+
+---
+
+Feel free to fork, star, or contribute! 🌟
